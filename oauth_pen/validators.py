@@ -194,6 +194,23 @@ class OAuth2Validator(RequestValidator):
             authenticated = self._authenticate_request_body(request)
         return authenticated
 
+    def authenticate_client_id(self, client_id, request, *args, **kwargs):
+        """
+        当 client 认证没有通过时（confidential的类型没有通过认证 或者是 public类型的client）
+        :param client_id:
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+
+        if not self._load_application(client_id, request):
+            return request.client.client_type != AbstractApplication.CLIENT_CONFIDENTIAL  # 如果是public类型的client
+        return False
+
+    def confirm_redirect_uri(self, client_id, code, redirect_uri, client, *args, **kwargs):
+        pass
+
     def save_authorization_code(self, client_id, code, request, *args, **kwargs):
         pass
 
@@ -219,9 +236,6 @@ class OAuth2Validator(RequestValidator):
         pass
 
     def get_id_token(self, token, token_handler, request):
-        pass
-
-    def confirm_redirect_uri(self, client_id, code, redirect_uri, client, *args, **kwargs):
         pass
 
     def validate_user_match(self, id_token_hint, scopes, claims, request):
@@ -257,19 +271,7 @@ class OAuth2Validator(RequestValidator):
     def get_default_scopes(self, client_id, request, *args, **kwargs):
         pass
 
-    def authenticate_client_id(self, client_id, request, *args, **kwargs):
-        """
-        当 client 认证没有通过时（confidential的类型没有通过认证 或者是 public类型的client）
-        :param client_id:
-        :param request:
-        :param args:
-        :param kwargs:
-        :return:
-        """
 
-        if not self._load_application(client_id, request):
-            return request.client.client_type != AbstractApplication.CLIENT_CONFIDENTIAL  # 如果是public类型的client
-        return False
 
 
 def validate_uris(value):
