@@ -13,6 +13,8 @@ class User(models.Model):
 
 
 class AbstractApplication(models.Model):
+    CLIENT_CONFIDENTIAL = 'confidential'
+
     """
     认证服务器的一个客户端实例
     """
