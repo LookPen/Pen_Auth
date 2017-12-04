@@ -1,6 +1,6 @@
 import os
 
-from Pen_Auth.constants import DEFAULT_DB_CONN
+from oauth_pen.constants import DEFAULT_DB_CONN
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'e)@$==g!fz_uq^neh&0zvxw&-)$s6ygzl+pl!3f)xej)sggufx'

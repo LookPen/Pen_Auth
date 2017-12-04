@@ -6,8 +6,9 @@
 # @Desc  :
 
 import os
+
+import oauth_pen.constants as oc
 import oauth_pen.provider as op
-import Pen_Auth.constants as oc
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Pen_Test.settings")
 
