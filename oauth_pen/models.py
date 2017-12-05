@@ -9,7 +9,7 @@ from oauth_pen.validators import validate_uris
 
 
 class User(models.Model):
-    pass
+    name = models.CharField(max_length=255, blank=True)
 
 
 class AbstractApplication(models.Model):
@@ -20,10 +20,11 @@ class AbstractApplication(models.Model):
     client_id = models.CharField(max_length=100, unique=True, default=generate_client_id, db_index=True)
     redirect_uris = models.TextField(blank=True, validators=[validate_uris])  # 允许重定向的url
     client_type = models.CharField(max_length=32, default=oc.APPLICATION_CLIENT_TYPE[0])
-    authorization_grant_type = models.CharField(max_length=32, choices=oc.APPLICATION_GRANT_TYPE[0])
+    authorization_grant_type = models.CharField(max_length=32, default=oc.APPLICATION_GRANT_TYPE[0])
     client_secret = models.CharField(max_length=255, blank=True, default=generate_client_secret, db_index=True)
     name = models.CharField(max_length=255, blank=True)
     skip_authorization = models.BooleanField(default=False)
+    is_usable = models.BooleanField(default=True)
 
     @property
     def default_redirect_uri(self):
@@ -63,7 +64,8 @@ class AbstractApplication(models.Model):
 
 class Application(AbstractApplication):
     class Meta(AbstractApplication.Meta):
-        swappable = 'OAUTH2_PROVIDER_APPLICATION_MODEL'
+        # swappable = 'OAUTH2_PROVIDER_APPLICATION_MODEL'
+        pass
 
 
 class AccessToken(models.Model):

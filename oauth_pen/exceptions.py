@@ -17,3 +17,8 @@ class OAuthError(Exception):
 
 class FatalClientError(OAuthError):
     pass
+
+
+class AccessDeniedError(OAuthError):
+    error = 'access_denied'
+    status_code = 401

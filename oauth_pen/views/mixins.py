@@ -8,13 +8,14 @@
 import logging
 
 from django.core.exceptions import ImproperlyConfigured
+from django.views import View
 
 from oauth_pen.exceptions import FatalClientError
 
 log = logging.getLogger("oauth2_provider")
 
 
-class OAuthMixin:
+class OAuthMixin(View):
     server_class = None
     validator_class = None
     oauth_backend_class = None
@@ -79,6 +80,7 @@ class OAuthMixin:
         :return:
         """
         core = self.get_oauth_core(request, credentials, allow)
+        return core.get_oauth_core(request, credentials, allow)
 
     def create_token_response(self, request):
         """
@@ -86,7 +88,7 @@ class OAuthMixin:
         :param request:
         :return:
         """
-        core = self.get_oauthlib_core()
+        core = self.get_oauth_core()
         return core.create_token_response(request)
 
     def create_revocation_response(self, request):

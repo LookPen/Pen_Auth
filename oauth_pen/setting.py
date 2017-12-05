@@ -6,8 +6,6 @@ DEFAULTS = {
     'ROTATE_REFRESH_TOKEN': True,  # 刷新token时 是否使用新的的token字符串
     'AUTHORIZATION_CODE_EXPIRE_SECONDS': 60,  # Code 过期时间 单位 秒
     'ACCESS_TOKEN_EXPIRE_SECONDS': 36000,  # token 过期时间 单位 秒
-    'OAUTH2_VALIDATOR_CLASS': 'oauth_pen.validators.OAuth2Validator',  # 授权验证类
-    'OAUTH2_SERVER_CLASS': 'oauthlib.oauth2.Server',  # 授权服务类
 }
 
 
