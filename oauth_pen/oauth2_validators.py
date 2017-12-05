@@ -57,7 +57,7 @@ class OAuth2Validator(RequestValidator):
         try:
             request.client = request.client or om.Application.objects.get(client_id=client_id)
 
-            if not request.client.is_usable(request):
+            if not request.client.is_usable:
                 log.debug('{0} 不可用'.format(client_id))
                 return None
             return request.client
@@ -124,11 +124,11 @@ class OAuth2Validator(RequestValidator):
             return False
 
         if self._load_application(client_id, request) is None:
-            log.debug('basic认证失败：{0} 的 application不存在'.format(client_id))
+            log.debug('客户端认证失败：{0} 的 application不存在'.format(client_id))
             return False
 
         elif request.client.client_secret != client_secret:
-            log.debug("basic认证失败：错误的client_secret")
+            log.debug("客户端认证失败：错误的client_secret")
             return False
         else:
             return True
@@ -177,16 +177,16 @@ class OAuth2Validator(RequestValidator):
 
     def authenticate_client_id(self, client_id, request, *args, **kwargs):
         """
-        当 client 认证没有通过时（confidential的类型没有通过认证 或者是 public类型的client）
+        通过 client_authentication_required 判断出不需要认证后，会触发该方法，验证在不需要认证的情况下，认证是否通过
         :param client_id:
         :param request:
         :param args:
         :param kwargs:
-        :return:
+        :return: 客户端认证是否通过
         """
 
         if not self._load_application(client_id, request):
-            return request.client.client_type != AbstractApplication.CLIENT_CONFIDENTIAL  # 如果是public类型的client
+            return request.client.client_type != om.AbstractApplication.CLIENT_CONFIDENTIAL  # 如果是public类型的client
         return False
 
     def confirm_redirect_uri(self, client_id, code, redirect_uri, client, *args, **kwargs):
@@ -519,13 +519,7 @@ class OAuth2Validator(RequestValidator):
         :param kwargs:
         :return:
         """
-
-
-        u = authenticate(username=username, password=password)
-        if u is not None and u.is_active:
-            request.user = u
-            return True
-        return False
+        return True # TODO
 
     def validate_user_match(self, id_token_hint, scopes, claims, request):
         """
