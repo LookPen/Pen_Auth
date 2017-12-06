@@ -8,6 +8,8 @@ import base64
 import logging
 from datetime import timedelta
 from urllib.parse import unquote_plus
+
+from django.db import transaction
 from oauthlib.oauth2 import RequestValidator
 
 from django.contrib.auth import authenticate
@@ -305,6 +307,7 @@ class OAuth2Validator(RequestValidator):
         access_token.save()
         return access_token
 
+    @transaction.atomic
     def save_bearer_token(self, token, request, *args, **kwargs):
         """
         保存token
@@ -322,17 +325,29 @@ class OAuth2Validator(RequestValidator):
             # 刷新操作
             refresh_token_instance = getattr(request, 'refresh_token_instance', None)
 
-            if not isinstance(refresh_token_instance, om.RefreshToken) or not refresh_token_instance.access_token:
-                raise AttributeError('request 的refresh_token_instance 不存在')
+            if not self.rotate_refresh_token(request) and \
+                    isinstance(refresh_token_instance, om.RefreshToken) and \
+                    refresh_token_instance.access_token:
 
-            if self.rotate_refresh_token(request):
-                # 使用新的token 字符串
-                try:
-                    refresh_token_instance.revoke()
-                except (om.AccessToken.DoesNotExist, om.RefreshToken.DoesNotExist):
-                    pass
-                else:
-                    setattr(request, 'refresh_token_instance', None)
+                # token 重复使用
+                access_token = om.AccessToken.objects.select_for_update().get(
+                    pk=refresh_token_instance.access_token.pk
+                )
+                access_token.user = request.user
+                access_token.scope = token['scope']
+                access_token.expires = expires
+                access_token.token = token['access_token']
+                access_token.application = request.client
+                access_token.save()
+            else:
+                # 使用新的token
+                if isinstance(refresh_token_instance, om.RefreshToken):
+                    try:
+                        refresh_token_instance.revoke()
+                    except (om.AccessToken.DoesNotExist, om.RefreshToken.DoesNotExist):
+                        pass
+                    else:
+                        setattr(request, 'refresh_token_instance', None)
 
                 access_token = self._create_access_token(expires, request, token)
 
@@ -343,14 +358,6 @@ class OAuth2Validator(RequestValidator):
                     access_token=access_token
                 )
                 refresh_token.save()
-            else:
-                # 保持老的token字符串
-                access_token = om.AccessToken.objects.select_for_update().get(pk=refresh_token_instance.access_token.pk)
-                access_token.user = request.user
-                access_token.expires = expires
-                access_token.token = token['access_token']
-                access_token.application = request.client
-                access_token.save()
         else:
             # 不需要刷新、直接添加token
             self._create_access_token(expires, request, token)
@@ -519,7 +526,13 @@ class OAuth2Validator(RequestValidator):
         :param kwargs:
         :return:
         """
-        return True # TODO
+        # TODO
+        try:
+            user = om.User.objects.get(name=username, password=password)
+            request.user = user
+            return True
+        except:
+            return False
 
     def validate_user_match(self, id_token_hint, scopes, claims, request):
         """

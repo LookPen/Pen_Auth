@@ -10,6 +10,7 @@ from oauth_pen.validators import validate_uris
 
 class User(models.Model):
     name = models.CharField(max_length=255, blank=True)
+    password = models.CharField(max_length=255, blank=True)
 
 
 class AbstractApplication(models.Model):
