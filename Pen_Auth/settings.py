@@ -36,7 +36,7 @@ ROOT_URLCONF = 'Pen_Auth.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'oauth_pen/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,3 +97,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+LOGIN_URL = '/o/login'

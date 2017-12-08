@@ -84,7 +84,7 @@ class OAuthMixin(View):
 
     def create_token_response(self, request):
         """
-
+        生产token
         :param request:
         :return:
         """
@@ -93,11 +93,11 @@ class OAuthMixin(View):
 
     def create_revocation_response(self, request):
         """
-
+        销毁token
         :param request:
         :return:
         """
-        core = self.get_oauthlib_core()
+        core = self.get_oauth_core()
         return core.create_revocation_response(request)
 
     def verify_request(self, request):
@@ -106,7 +106,7 @@ class OAuthMixin(View):
         :param request:
         :return:
         """
-        core = self.get_oauthlib_core()
+        core = self.get_oauth_core()
         return core.verify_request(request, scopes=self.get_scopes())
 
     def error_response(self, error, **kwargs):
