@@ -80,7 +80,7 @@ class OAuthMixin(View):
         :return:
         """
         core = self.get_oauth_core(request, credentials, allow)
-        return core.get_oauth_core(request, credentials, allow)
+        return core.create_authorization_response(request, credentials, allow)
 
     def create_token_response(self, request):
         """
