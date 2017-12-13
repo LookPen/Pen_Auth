@@ -1,4 +1,3 @@
-
 from urllib.parse import urlparse, parse_qsl
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
@@ -18,7 +17,7 @@ class User(AbstractBaseUser):
     name = models.CharField(max_length=255, unique=True, blank=True)
 
 
-class AbstractApplication(models.Model):
+class Application(models.Model):
     """
     认证服务器的一个客户端实例
     """
@@ -61,17 +60,8 @@ class AbstractApplication(models.Model):
 
         return False
 
-    class Meta:
-        abstract = True
-
     def __str__(self):
         return self.name or self.client_id
-
-
-class Application(AbstractApplication):
-    class Meta(AbstractApplication.Meta):
-        # swappable = 'OAUTH2_PROVIDER_APPLICATION_MODEL'
-        pass
 
 
 class AccessToken(models.Model):

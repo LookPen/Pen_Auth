@@ -473,6 +473,23 @@ class OAuth2Validator(RequestValidator):
         except ObjectDoesNotExist:
             return False
 
+    def validate_user(self, username, password, client, request, *args, **kwargs):
+        """
+        验证用户名密码
+        :param username:
+        :param password:
+        :param client:
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        u = authenticate(username=username, password=password)
+        if u is not None and u.is_active:
+            request.user = u
+            return True
+        return False
+
     def validate_response_type(self, client_id, response_type, client, request, *args, **kwargs):
         """
         请求类型验证 eg:code
@@ -513,24 +530,7 @@ class OAuth2Validator(RequestValidator):
         :param request:
         :return:
         """
-        True  # TODO：暂不实现
-
-    def validate_user(self, username, password, client, request, *args, **kwargs):
-        """
-        验证用户名密码
-        :param username:
-        :param password:
-        :param client:
-        :param request:
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        u = authenticate(username=username, password=password)
-        if u is not None and u.is_active:
-            request.user = u
-            return True
-        return False
+        return True  # TODO：暂不实现
 
     def validate_user_match(self, id_token_hint, scopes, claims, request):
         """
@@ -541,3 +541,4 @@ class OAuth2Validator(RequestValidator):
         :param request:
         :return:
         """
+        pass # TODO：暂不实现
