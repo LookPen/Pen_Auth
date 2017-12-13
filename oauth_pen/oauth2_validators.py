@@ -277,7 +277,7 @@ class OAuth2Validator(RequestValidator):
         :return:
         """
         expires = timezone.now() + timedelta(seconds=oauth2_settings.AUTHORIZATION_CODE_EXPIRE_SECONDS)
-
+        
         om.Grant.objects.create(application=request.client,
                                 user=request.user,
                                 code=code['code'],
@@ -475,7 +475,7 @@ class OAuth2Validator(RequestValidator):
 
     def validate_response_type(self, client_id, response_type, client, request, *args, **kwargs):
         """
-        请求类型验证
+        请求类型验证 eg:code
         :param client_id:
         :param response_type:
         :param client:

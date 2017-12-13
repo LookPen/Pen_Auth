@@ -98,3 +98,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_URL = '/o/login'
+
+AUTH_USER_MODEL = 'oauth_pen.User'

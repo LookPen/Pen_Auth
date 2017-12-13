@@ -11,7 +11,7 @@ from django.contrib.auth import authenticate
 
 from oauth_pen.exceptions import OAuthPenError
 from oauth_pen.forms import AllowForm, AccountForm
-from oauth_pen.models import Application
+from oauth_pen.models import Application, User
 from oauth_pen.views.mixins import OAuthMixin
 
 import oauth_pen.oauth2_validators as ov
@@ -72,6 +72,7 @@ class BaseAuthorizationView(LoginRequiredMixin, OAuthMixin):
     """
 
     def dispatch(self, request, *args, **kwargs):
+        self.oauth2_data = {}
         return super(BaseAuthorizationView, self).dispatch(request, *args, **kwargs)
 
     def error_response(self, error, **kwargs):
@@ -128,44 +129,42 @@ class AuthorizationView(BaseAuthorizationView, FormView):
         except OAuthPenError as error:
             return self.error_response(error)
 
-    # def get(self, request, *args, **kwargs):
-    #     try:
-    #         scopes, credentials = self.validate_authorization_request(request)
-    #
-    #         application = Application.objects.get(client_id=credentials['client_id'])
-    #         kwargs['application'] = application
-    #         kwargs['client_id'] = credentials['client_id']
-    #         kwargs['redirect_uri'] = credentials['redirect_uri']
-    #         kwargs['response_type'] = credentials['response_type']
-    #         kwargs['state'] = credentials['state']
-    #
-    #         self.oauth2_data = kwargs
-    #
-    #         form = self.get_form(self.get_form_class())
-    #         kwargs['form'] = form
-    #
-    #         require_approval = request.GET.get('approval_prompt', 'force')
-    #
-    #         if application.skip_authorization:
-    #             uri, headers, body, status = self.create_authorization_response(
-    #                 request=self.request, credentials=credentials, allow=True)
-    #             return HttpResponseRedirect(uri)
-    #         elif require_approval == 'auto':
-    #             tokens = request.user.accesstoken_set.filter(application=kwargs['application'],
-    #                                                          expires__gt=timezone.now()).all()
-    #             for token in tokens:
-    #                 if token.allow_scopes(scopes):
-    #                     uri, headers, body, status = self.create_authorization_response(
-    #                         request=self.request, credentials=credentials, allow=True)
-    #
-    #                     return HttpResponseRedirect(uri)
-    #
-    #         return self.render_to_response(self.get_context_data(**kwargs))
-    #
-    #     except OAuthPenError as error:
-    #         return self.error_response(error)
-    #
-    #     return HttpResponse()
+    def get(self, request, *args, **kwargs):
+        try:
+            scopes, credentials = self.validate_authorization_request(request)
+
+            application = Application.objects.get(client_id=credentials['client_id'])
+            kwargs['application'] = application
+            kwargs['client_id'] = credentials['client_id']
+            kwargs['redirect_uri'] = credentials['redirect_uri']
+            kwargs['response_type'] = credentials['response_type']
+            kwargs['state'] = credentials['state']
+
+            self.oauth2_data = kwargs
+
+            form = self.get_form(self.get_form_class())
+            kwargs['form'] = form
+
+            require_approval = request.GET.get('approval_prompt', 'force')
+
+            if application.skip_authorization:
+                uri, headers, body, status = self.create_authorization_response(
+                    request=self.request, credentials=credentials, allow=True)
+                return HttpResponseRedirect(uri)
+            elif require_approval == 'auto':
+                tokens = request.user.accesstoken_set.filter(application=kwargs['application'],
+                                                             expires__gt=timezone.now()).all()
+                for token in tokens:
+                    if token.allow_scopes(scopes):
+                        uri, headers, body, status = self.create_authorization_response(
+                            request=self.request, credentials=credentials, allow=True)
+
+                        return HttpResponseRedirect(uri)
+
+            return self.render_to_response(self.get_context_data(**kwargs))
+
+        except OAuthPenError as error:
+            return self.error_response(error)
 
 
 class LoginView(FormView):
@@ -179,6 +178,8 @@ class LoginView(FormView):
         password = form.cleaned_data.get('password')
 
         user = authenticate(self.request, **{'username': username, 'password': password})
+
+        # user = User.objects.get(name=username, password=password)
 
         if user:
             login(self.request, user=user)
