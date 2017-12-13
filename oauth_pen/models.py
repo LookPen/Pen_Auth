@@ -1,8 +1,9 @@
-from datetime import timezone
+
 from urllib.parse import urlparse, parse_qsl
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.utils import timezone
 
 import oauth_pen.constants as oc
 from Pen_Auth import settings

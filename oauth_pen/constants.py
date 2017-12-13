@@ -9,5 +9,5 @@
 DEFAULT_DB_CONN = ('127.0.0.1', 'my_blog', 'root', 'root')
 
 # oauth application 常量
-APPLICATION_GRANT_TYPE = ('password', 'authorization-code', 'implicit', 'client-credentials','refresh_token')
+APPLICATION_GRANT_TYPE = ('password', 'authorization_code', 'implicit', 'client_credentials','refresh_token')
 APPLICATION_CLIENT_TYPE = ('confidential', 'public')
