@@ -210,25 +210,25 @@ class OAuth2Validator(RequestValidator):
 
     def get_default_scopes(self, client_id, request, *args, **kwargs):
         """
-        获取默认的授权范围  暂不实现 TODO
+        获取默认的授权范围
         :param client_id:
         :param request:
         :param args:
         :param kwargs:
         :return:
         """
-        pass
+        pass  # TODO:暂不实现
 
     def get_original_scopes(self, refresh_token, request, *args, **kwargs):
         """
-        获取授权范围  暂不实现 TODO
+        获取授权范围
         :param refresh_token:
         :param request:
         :param args:
         :param kwargs:
         :return:
         """
-        pass
+        pass  # TODO 暂不实现
 
     def invalidate_authorization_code(self, client_id, code, request, *args, **kwargs):
         """
@@ -277,7 +277,7 @@ class OAuth2Validator(RequestValidator):
         :return:
         """
         expires = timezone.now() + timedelta(seconds=oauth2_settings.AUTHORIZATION_CODE_EXPIRE_SECONDS)
-        
+
         om.Grant.objects.create(application=request.client,
                                 user=request.user,
                                 code=code['code'],
@@ -484,7 +484,7 @@ class OAuth2Validator(RequestValidator):
         :param kwargs:
         :return:
         """
-        return True  # 暂不实现TODO
+        return True  # TODO ： 暂不实现
 
     def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
         """
@@ -497,7 +497,7 @@ class OAuth2Validator(RequestValidator):
         :param kwargs:
         :return:
         """
-        return True  # 暂不实现TODO
+        return True  # TODO：  暂不实现
 
     def validate_silent_login(self, request):
         """
@@ -505,7 +505,7 @@ class OAuth2Validator(RequestValidator):
         :param request:
         :return:
         """
-        return True  # 暂不实现TODO
+        return True  # TODO： 暂不实现
 
     def validate_silent_authorization(self, request):
         """
@@ -513,7 +513,7 @@ class OAuth2Validator(RequestValidator):
         :param request:
         :return:
         """
-        True  # 暂不实现TODO
+        True  # TODO：暂不实现
 
     def validate_user(self, username, password, client, request, *args, **kwargs):
         """
@@ -526,13 +526,11 @@ class OAuth2Validator(RequestValidator):
         :param kwargs:
         :return:
         """
-        # TODO
-        try:
-            user = om.User.objects.get(name=username, password=password)
-            request.user = user
+        u = authenticate(username=username, password=password)
+        if u is not None and u.is_active:
+            request.user = u
             return True
-        except:
-            return False
+        return False
 
     def validate_user_match(self, id_token_hint, scopes, claims, request):
         """

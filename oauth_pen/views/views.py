@@ -2,16 +2,13 @@ import oauthlib
 from braces.views import CsrfExemptMixin, LoginRequiredMixin
 from django.contrib.auth import login, REDIRECT_FIELD_NAME
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
 from django.utils import timezone
-from django.views import View
 from django.views.generic import FormView
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 
 from oauth_pen.exceptions import OAuthPenError
 from oauth_pen.forms import AllowForm, AccountForm
-from oauth_pen.models import Application, User
+from oauth_pen.models import Application
 from oauth_pen.views.mixins import OAuthMixin
 
 import oauth_pen.oauth2_validators as ov
@@ -89,7 +86,7 @@ class BaseAuthorizationView(LoginRequiredMixin, OAuthMixin):
 
         status = error_response['error'].status_code
 
-        return self.render_to_response(error_response, status=status)  # TODO
+        return self.render_to_response(error_response, status=status)  # TODO 异常处理及自定义异常 暂不实现
 
 
 class AuthorizationView(BaseAuthorizationView, FormView):
@@ -178,8 +175,6 @@ class LoginView(FormView):
         password = form.cleaned_data.get('password')
 
         user = authenticate(self.request, **{'username': username, 'password': password})
-
-        # user = User.objects.get(name=username, password=password)
 
         if user:
             login(self.request, user=user)

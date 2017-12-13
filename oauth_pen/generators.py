@@ -28,12 +28,10 @@ class ClientSecretGenerator:
 
 def generate_client_id():
     """
-    产生客户端ID 的工厂,后期加在setting 中配置ClientIdGenerator TODO
+    产生客户端ID 的工厂
     :return:
     """
-
-    # client_id_generator = oauth2_settings.CLIENT_ID_GENERATOR_CLASS()
-
+    # TODO 后期加在setting 中配置ClientIdGenerator
     client_id_generator = ClientIdGenerator()
     return client_id_generator.hash()
 
